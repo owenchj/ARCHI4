@@ -12,7 +12,7 @@
 
 	.extern	seg_stack_base
 	.extern	seg_data_base
-
+        
 	.globl  reset	 			# makes reset an external symbol
 	.ent	reset
 	.func	reset
@@ -23,12 +23,12 @@ reset:
 
 # initializes stack pointer
 	la	$27,	seg_stack_base
-        li	$26, 65536 # $26 <= 64K
+        li	$26, 0x10000 # $26 <= 64K
 	addu	$29, $27, $26		# $29 <= seg_stack_base + 64K
 
 # initializes EPC register
-	la	$26,	main		# $26 <= address main
-	mtc0	$26,	$14		# EPC <= main
+	# la	$26,	main		# $26 <= address main
+	# mtc0	$26,	$14		# EPC <= main
 
 # initializes SR register
        	li	$26,	0x0000FF13
@@ -36,7 +36,7 @@ reset:
 
 # jumps to main
         la      $26, seg_data_base         # $26 <= seg_data_base
-        lw      $26, ($26)         # $26 <= M[seg_data_base]
+        lw      $26, 0($26)         # $26 <= M[seg_data_base]
         mtc0    $26, $14         # EPC <= $26  (EPC == $14)
 	eret
 
@@ -44,3 +44,6 @@ reset:
 	.size	reset, .-reset
 
 	.set reorder
+
+
+
