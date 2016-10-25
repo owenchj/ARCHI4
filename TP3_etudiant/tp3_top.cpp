@@ -72,7 +72,7 @@
 #define SEG_TTY_SIZE      0x40
 
 #define SEG_GCD_BASE      0x95000000
-#define SEG_GCD_SIZE      0x04
+#define SEG_GCD_SIZE      0xF
 
 // TGTID definition
 #define TGTID_ROM    0
@@ -165,20 +165,20 @@ int _main(int argc, char *argv[])
     //////////////////////////////////////////////////////////////////////////
     // Mapping Table
     //////////////////////////////////////////////////////////////////////////
-    MappingTable maptab(32, IntTab(2), IntTab(1), 0x07000000);
+    MappingTable maptab(32, IntTab(8), IntTab(1), 0xFFF00000);
 
-    maptab.add(Segment("seg_reset", SEG_RESET_BASE, SEG_RESET_SIZE, IntTab(TGTID_ROM), false));
+    maptab.add(Segment("seg_reset", SEG_RESET_BASE, SEG_RESET_SIZE, TGTID_ROM, false));
 
-    maptab.add(Segment("seg_kcode", SEG_KCODE_BASE, SEG_KCODE_SIZE, IntTab(TGTID_RAM), true));
-    maptab.add(Segment("seg_kdata", SEG_KDATA_BASE, SEG_KDATA_SIZE, IntTab(TGTID_RAM), true));
-    maptab.add(Segment("seg_kunc" , SEG_KUNC_BASE , SEG_KUNC_SIZE , IntTab(TGTID_RAM), false));
-    maptab.add(Segment("seg_code" , SEG_CODE_BASE , SEG_CODE_SIZE , IntTab(TGTID_RAM), true));
-    maptab.add(Segment("seg_data" , SEG_DATA_BASE , SEG_DATA_SIZE , IntTab(TGTID_RAM), true));
-    maptab.add(Segment("seg_stack", SEG_STACK_BASE, SEG_STACK_SIZE, IntTab(TGTID_RAM), true));
+    maptab.add(Segment("seg_kcode", SEG_KCODE_BASE, SEG_KCODE_SIZE, TGTID_RAM, true));
+    maptab.add(Segment("seg_kdata", SEG_KDATA_BASE, SEG_KDATA_SIZE, TGTID_RAM, true));
+    maptab.add(Segment("seg_kunc" , SEG_KUNC_BASE , SEG_KUNC_SIZE , TGTID_RAM, false));
+    maptab.add(Segment("seg_code" , SEG_CODE_BASE , SEG_CODE_SIZE , TGTID_RAM, true));
+    maptab.add(Segment("seg_data" , SEG_DATA_BASE , SEG_DATA_SIZE , TGTID_RAM, true));
+    maptab.add(Segment("seg_stack", SEG_STACK_BASE, SEG_STACK_SIZE, TGTID_RAM, true));
 
-    maptab.add(Segment("seg_tty"  , SEG_TTY_BASE  , SEG_TTY_SIZE  , IntTab(TGTID_TTY), false));
+    maptab.add(Segment("seg_tty"  , SEG_TTY_BASE  , SEG_TTY_SIZE  , TGTID_TTY, false));
 
-    maptab.add(Segment("seg_gcd"  , SEG_GCD_BASE  , SEG_GCD_SIZE  , IntTab(TGTID_GCD), false));
+    maptab.add(Segment("seg_gcd"  , SEG_GCD_BASE  , SEG_GCD_SIZE  , TGTID_GCD, false));
 
     std::cout << std::endl << maptab << std::endl;
 
@@ -199,25 +199,60 @@ int _main(int argc, char *argv[])
     // Components
     //////////////////////////////////////////////////////////////////////////
 
-    Loader    loader(TO BE COMPLETED);
+    Loader    loader("soft/sys.bin",
+                     "soft/app.bin");
 
-    VciXcacheWrapper<vci_param, Mips32ElIss>* proc
-        proc = new VciXcacheWrapper<vci_param, Mips32ElIss>(TO BE COMPLETED);
+    // sc_module_name insname,
+    //     int proc_id,
+    //     const soclib::common::MappingTable &mt,
+    //     const soclib::common::IntTab &index,
+    //     size_t icache_ways,  // number of ways per associative set (instruction cache)
+    //     size_t icache_sets,  // number of  associative sets (instruction cache)
+    //     size_t icache_words,  // number of words per line (instruction cache)
+    //     size_t dcache_ways,  // number of ways per associative set (data cache)
+    //     size_t dcache_sets,  // number of  associative sets (data cache)
+    //     size_t dcache_words);  // number of words per line (data cache)
+
+    VciXcacheWrapper<vci_param, Mips32ElIss>* proc;
+    proc = new VciXcacheWrapper<vci_param, Mips32ElIss>(
+        "my_VciXcacheWrapper",
+        0,
+        maptab,
+        0,
+        icache_ways,
+        icache_sets,
+        icache_words,
+        dcache_ways,
+        dcache_sets,
+        dcache_words);
+
+    // VciSimpleRam(
+    // sc_module_name name,                     // Instance name
+    // const soclib::common::IntTab &index,     //  Target index
+    // const soclib::common::MappingTable &mt,  // Mapping Table
+    // soclib::common::Loader &loader,          // Loader
+    // const uint32_t latency);                 // Latency (Optionnal argument)
 
     VciSimpleRam<vci_param>* rom;
-    rom = new VciSimpleRam<vci_param>(TO BE COMPLETED);
+    rom = new VciSimpleRam<vci_param>("my_VciSimpleRam_rom", TGTID_ROM, maptab, loader, 0);
 
     VciSimpleRam<vci_param>* ram;
-    ram = new VciSimpleRam<vci_param>(TO BE COMPLETED);
+    ram = new VciSimpleRam<vci_param>("my_VciSimpleRam_ram", TGTID_RAM, maptab, loader, 0);
 
+    // VciMultiTty(
+    //     sc_module_name name,   // Instance name
+    //     const soclib::common::IntTab &index,   //  Target index
+    //     const soclib::common::MappingTable &mt,   // Mapping Table
+    //     const char *first_tty_name, ...);   // TTY names (as many names as terminals), NULL terminated
     VciMultiTty<vci_param>* tty;
-    tty = new VciMultiTty<vci_param>(TO BE COMPLETED);
+    tty = new VciMultiTty<vci_param>("my_tty", TGTID_TTY, maptab, "term0", NULL);
 
     VciGcdCoprocessor<vci_param>* gcd;
-    gcd = new VciGcdCoprocessor<vci_param>(TO BE COMPLETED);
+    gcd = new VciGcdCoprocessor<vci_param>("coprocessor", TGTID_GCD, maptab);
 
     VciVgsb<vci_param>* bus;
-    bus = new VciVgsb<vci_param>(TO BE COMPLETED);
+    bus = new VciVgsb<vci_param>("vgsb", maptab, 1, 4);
+
 
     //////////////////////////////////////////////////////////////////////////
     // Net-List
@@ -251,16 +286,20 @@ int _main(int argc, char *argv[])
 
     bus->p_clk(signal_clk);
     bus->p_resetn(signal_resetn);
-    TO BE COMPLETED
-        TO BE COMPLETED
-        TO BE COMPLETED
-        TO BE COMPLETED
-        TO BE COMPLETED
 
-        //////////////////////////////////////////////////////////////////////////
-        // simulation
-        //////////////////////////////////////////////////////////////////////////
-        signal_false = false;
+    // interconnection
+    // master
+    bus->p_to_initiator[0](signal_vci_proc);
+    // slave
+    bus->p_to_target[0](signal_vci_rom);
+    bus->p_to_target[1](signal_vci_ram);
+    bus->p_to_target[2](signal_vci_tty);
+    bus->p_to_target[3](signal_vci_gcd);
+
+    //////////////////////////////////////////////////////////////////////////
+    // simulation
+    //////////////////////////////////////////////////////////////////////////
+    signal_false = false;
     signal_resetn = false;
     sc_start( sc_time( 1, SC_NS ) ) ;
 
