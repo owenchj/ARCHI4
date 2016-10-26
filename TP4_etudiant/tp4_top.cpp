@@ -72,26 +72,26 @@
 #define SEG_STACK_BASE  0x02000000
 #define SEG_STACK_SIZE  0x01000000
 
-#define SEG_TTY_BASE    TO BE COMPLETED
-#define SEG_TTY_SIZE    TO BE COMPLETED
+#define SEG_TTY_BASE    0x90000000
+#define SEG_TTY_SIZE    0x40
 
-#define SEG_TIM_BASE    TO BE COMPLETED
-#define SEG_TIM_SIZE    TO BE COMPLETED
+#define SEG_TIM_BASE    0x91000000
+#define SEG_TIM_SIZE    0xF
 
-#define SEG_IOC_BASE    TO BE COMPLETED
-#define SEG_IOC_SIZE    TO BE COMPLETED
+#define SEG_IOC_BASE    0x92000000
+#define SEG_IOC_SIZE    0x24
 
-#define SEG_DMA_BASE    TO BE COMPLETED
-#define SEG_DMA_SIZE    TO BE COMPLETED
+#define SEG_DMA_BASE    0x93000000
+#define SEG_DMA_SIZE    0x14
 
-#define SEG_FBF_BASE    TO BE COMPLETED
-#define SEG_FBF_SIZE    TO BE COMPLETED
+#define SEG_FBF_BASE    0x96000000
+#define SEG_FBF_SIZE    0x0
 
-#define SEG_ICU_BASE    TO BE COMPLETED
-#define SEG_ICU_SIZE    TO BE COMPLETED
+#define SEG_ICU_BASE    0x9F000000
+#define SEG_ICU_SIZE    0x14
 
-#define SEG_GCD_BASE    TO BE COMPLETED
-#define SEG_GCD_SIZE    TO BE COMPLETED
+#define SEG_GCD_BASE    0x95000000
+#define SEG_GCD_SIZE    0xF
 
 // SRCID definition
 #define SRCID_PROC      0
@@ -152,7 +152,7 @@ int _main(int argc, char *argv[])
     int     ncycles             = 1000000000;       // simulated cycles
     char    sys_path[256]       = "soft/sys_bin";   // pathname for system code
     char    app_path[256]       = "soft/app_bin";   // pathname for application code
-    char    ioc_filename[256]   = "to_be_defined";  // pathname for the ioc file
+    char    ioc_filename[256]   = "images.raw";  // pathname for the ioc file
     size_t  fbf_size            = 128;              // number of lines = number of pixels
     bool    debug               = false;            // debug activated
     int     from_cycle          = 0;                // debug start cycle
@@ -209,7 +209,7 @@ int _main(int argc, char *argv[])
     std::cout << "    ncycles      = " << ncycles << std::endl;
     std::cout << "    sys_pathname = " << sys_path << std::endl;
     std::cout << "    app_pathname = " << app_path << std::endl;
-    std::cout << "    ioc_filename = " << soft_name << std::endl;
+    //std::cout << "    ioc_filename = " << soft_name << std::endl;
     std::cout << "    icache_sets  = " << icache_sets << std::endl;
     std::cout << "    icache_words = " << icache_words << std::endl;
     std::cout << "    icache_ways  = " << icache_ways << std::endl;
@@ -231,13 +231,13 @@ int _main(int argc, char *argv[])
     maptab.add(Segment("seg_data"  , SEG_DATA_BASE  , SEG_DATA_SIZE  , IntTab(TGTID_RAM), true));
     maptab.add(Segment("seg_stack" , SEG_STACK_BASE , SEG_STACK_SIZE , IntTab(TGTID_RAM), true));
 
-    maptab.add(Segment("seg_tty"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_timer" , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_icu"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_dma"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_fbf"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_ioc"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_gcd"   , TO BE COMPLETED                                           ));
+    maptab.add(Segment("seg_tty"   , SEG_TTY_BASE   , SEG_TTY_SIZE   , IntTab(TGTID_TTY), false));
+    maptab.add(Segment("seg_timer" , SEG_TIM_BASE   , SEG_TIM_SIZE   , IntTab(TGTID_TIM), false));
+    maptab.add(Segment("seg_icu"   , SEG_ICU_BASE   , SEG_ICU_SIZE   , IntTab(TGTID_ICU), false));
+    maptab.add(Segment("seg_dma"   , SEG_DMA_BASE   , SEG_DMA_SIZE   , IntTab(TGTID_DMA), false));
+    maptab.add(Segment("seg_fbf"   , SEG_FBF_BASE   , SEG_FBF_SIZE   , IntTab(TGTID_FBF), false));
+    maptab.add(Segment("seg_ioc"   , SEG_IOC_BASE   , SEG_IOC_SIZE   , IntTab(TGTID_IOC), false));
+    maptab.add(Segment("seg_gcd"   , SEG_GCD_BASE   , SEG_GCD_SIZE   , IntTab(TGTID_GCD), false));
 
     std::cout << std::endl << maptab << std::endl;
 
@@ -280,7 +280,9 @@ int _main(int argc, char *argv[])
     // - IRQ[3] : dma
     //////////////////////////////////////////////////////////////
 
-    Loader loader(sys_path, app_path);
+    //Loader loader(sys_path, app_path);
+    Loader    loader("soft/sys.bin",
+                     "soft/app.bin");
 
     VciXcacheWrapper<vci_param, Mips32ElIss >* proc;
     proc = new VciXcacheWrapper<vci_param,Mips32ElIss>("proc", 0,maptab,IntTab(SRCID_PROC),
@@ -299,23 +301,56 @@ int _main(int argc, char *argv[])
     VciGcdCoprocessor<vci_param>* gcd;
     gcd = new VciGcdCoprocessor<vci_param>("gcd", IntTab(TGTID_GCD), maptab);
 
+    // VciTimer(
+    //  sc_module_name name,   //  Component Name
+    //  const soclib::common::IntTab & index,  // Target index
+    //  const soclib::common::MappingTable &mt,   // MappingTable
+    //  size_t nirq);   //  Number of available timers
+
     VciTimer<vci_param>* timer;
-    timer = new VciTimer<vci_param>(TO BE COMPLETED);
+    timer = new VciTimer<vci_param>("timer", IntTab(TGTID_TIM), maptab, 1);
 
+    // VciIcu(
+    //  sc_module_name name,  // Component Name
+    //  const soclib::common::InTab &index, // Target index
+    //  const soclib::common::MappingTable &mt,  // Mapping Table
+    //  size_t nirq);  // Number of input interrupts
     VciIcu<vci_param>* icu;
-    icu = new VciIcu<vci_param>(TO BE COMLETED);
+    icu = new VciIcu<vci_param>("icu", IntTab(TGTID_ICU), maptab, 4);
 
+    // VciDma(
+    //  sc_module_name name,   //  Component Name
+    //  const soclib::common::MappingTable &mt,   // MappingTable
+    //  const soclib::common::IntTab &srcid,  // Initiator index
+    //  const soclib::common::IntTab &tgtid,  // Target index
+    //  const size_t burst_size );   //  Number of bytes transfered in a burst
     VciDma<vci_param>* dma;
-    dma = new VciDma<vci_param>(TO BE COMPLETED);
+    dma = new VciDma<vci_param>("dma", maptab, IntTab(SRCID_DMA), IntTab(TGTID_DMA), plen_size);
 
+    // VciFrameBuffer(
+    //  sc_module_name name,   // Instance name
+    //  const soclib::common::IntTab &index,   //  Target index
+    //  const soclib::common::MappingTable &mt,   // Mapping Table
+    //  unsigned long width,   // number of pixel per line
+    //  unsigned long heigth,   // number of lines
+    //  int subsampling);   // optional argument : default value 420 corresponds to YUV420
     VciFrameBuffer<vci_param>* fbf;
-    fbf = new VciFrameBuffer<vci_param>(TO BE COMPLETED);
+    fbf = new VciFrameBuffer<vci_param>("fbf", IntTab(TGTID_FBF), maptab, fbf_size, fbf_size);
+
+    // VciBlockDevice(
+    //     sc_module_name name,   //  Component Name
+    //     const soclib::common::MappingTable &mt, // MappingTable
+    //     const soclib::common::IntTab &srcid,    // Initiator index
+    //     const soclib::common::IntTab &tgtid,    // Target index
+    //     const std::string &filename, // mapped file, may be a host block device
+    //     const uint32_t block_size = 512, // block size in bytes
+    //     const uint32_t latency = 0);  // initial access time (number of cycles)
 
     VciBlockDevice<vci_param>* ioc;
-    ioc = new VciBlockDevice<vci_param>(TO BE COMPLETED); 
+    ioc = new VciBlockDevice<vci_param>("ioc", maptab, IntTab(SRCID_IOC), IntTab(TGTID_IOC), std::string(ioc_filename));
 
     VciVgsb<vci_param>* bus;
-    bus = new VciVgsb<vci_param>(TO BE COMPLETED);
+    bus = new VciVgsb<vci_param>("vgsb", maptab, 3, 9);
 
     //////////////////////////////////////////////////////////////////////////
     // Net-List
@@ -356,10 +391,10 @@ int _main(int argc, char *argv[])
     icu->p_resetn                   (signal_resetn);
     icu->p_vci                      (signal_vci_tgt_icu);
     icu->p_irq                      (signal_irq_proc);
-    icu->p_irq_in[0]                (TO BE COMPLETED);
-    icu->p_irq_in[1]                (TO BE COMPLETED);
-    icu->p_irq_in[2]                (TO BE COMPLETED);
-    icu->p_irq_in[3]                (TO BE COMPLETED);
+    icu->p_irq_in[0]                (signal_irq_tim);
+    icu->p_irq_in[1]                (signal_irq_tty);
+    icu->p_irq_in[2]                (signal_irq_ioc);
+    icu->p_irq_in[3]                (signal_irq_dma);
 
     fbf->p_clk                      (signal_clk);
     fbf->p_resetn                   (signal_resetn);
@@ -379,18 +414,18 @@ int _main(int argc, char *argv[])
 
     bus->p_clk                      (signal_clk);
     bus->p_resetn                   (signal_resetn);
-    bus->p_to_initiator[SRCID_PROC] (TO BE COMPLETED);
-    bus->p_to_initiator[SRCID_DMA]  (TO BE COMPLETED);
-    bus->p_to_initiator[SRCID_IOC]  (TO BE COMPLETED);
-    bus->p_to_target[TGTID_ROM]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_RAM]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_TTY]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_GCD]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_TIM]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_ICU]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_DMA]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_FBF]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_IOC]     (TO BE COMPLETED);
+    bus->p_to_initiator[SRCID_PROC] (signal_vci_init_proc);
+    bus->p_to_initiator[SRCID_DMA]  (signal_vci_init_dma);
+    bus->p_to_initiator[SRCID_IOC]  (signal_vci_init_ioc);
+    bus->p_to_target[TGTID_ROM]     (signal_vci_tgt_rom);
+    bus->p_to_target[TGTID_RAM]     (signal_vci_tgt_ram);
+    bus->p_to_target[TGTID_TTY]     (signal_vci_tgt_tty);
+    bus->p_to_target[TGTID_GCD]     (signal_vci_tgt_gcd);
+    bus->p_to_target[TGTID_TIM]     (signal_vci_tgt_tim);
+    bus->p_to_target[TGTID_ICU]     (signal_vci_tgt_icu);
+    bus->p_to_target[TGTID_DMA]     (signal_vci_tgt_dma);
+    bus->p_to_target[TGTID_FBF]     (signal_vci_tgt_fbf);
+    bus->p_to_target[TGTID_IOC]     (signal_vci_tgt_ioc);
 
     //////////////////////////////////////////////////////////////////////////
     // simulation
@@ -447,4 +482,3 @@ int sc_main (int argc, char *argv[])
 // End:
 //
 // vim: filetype=cpp:expandtab:shiftwidth=4:tabstop=4:softtabstop=4
-
