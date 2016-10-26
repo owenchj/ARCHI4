@@ -73,14 +73,15 @@
 #define SEG_CODE_BASE   0x00400000
 #define SEG_CODE_SIZE   0x00004000
 
+// 2 processors
 #define SEG_STACK_BASE  0x02000000
-#define SEG_STACK_SIZE  0x01000000
+#define SEG_STACK_SIZE  0x01000000 * 2
 
 #define SEG_TTY_BASE    0x90000000
 #define SEG_TTY_SIZE    0x100
 
 #define SEG_TIM_BASE    0x91000000
-#define SEG_TIM_SIZE    0x3F
+#define SEG_TIM_SIZE    0x40
 
 #define SEG_IOC_BASE    0x92000000
 #define SEG_IOC_SIZE    0x24
@@ -98,7 +99,6 @@
 #define SEG_GCD_SIZE    0xF
 
 // SRCID definition
-const int SRCID_PROCS[] = { 0, 1, 2, 3 };
 #define SRCID_PROC      0
 #define SRCID_IOC       1
 #define SRCID_DMA       2
@@ -155,8 +155,8 @@ int _main(int argc, char *argv[])
     // command line arguments
     ///////////////////////////////////////////////////////////////
     int     ncycles             = 1000000000;       // simulated cycles
-    char    sys_path[256]       = "soft/sys_bin";   // pathname for system code
-    char    app_path[256]       = "soft/app_bin";   // pathname for application code
+    char    sys_path[256]       = "soft_multi/sys_bin";   // pathname for system code
+    char    app_path[256]       = "soft_multi/app_bin";   // pathname for application code
     char    ioc_filename[256]   = "images.raw";     // pathname for the ioc file
     size_t  fbf_size            = 128;              // number of lines = number of pixels
     bool    debug               = false;            // debug activated
@@ -239,7 +239,7 @@ int _main(int argc, char *argv[])
     //////////////////////////////////////////////////////////////////////////
     // Mapping Table
     //////////////////////////////////////////////////////////////////////////
-    MappingTable maptab(32, IntTab(8), IntTab(2), 0xFF000000);
+    MappingTable maptab(32, IntTab(8), IntTab(3), 0xFF000000);
 
     maptab.add(Segment("seg_reset" , SEG_RESET_BASE , SEG_RESET_SIZE , IntTab(TGTID_ROM), true));
 
@@ -285,9 +285,9 @@ int _main(int argc, char *argv[])
     sc_signal<bool> signal_false("signal_false");
 
     sc_signal<bool> *signal_irq_procs = alloc_elems<sc_signal<bool> >("signal_irq_proc", nb_procs);
-    sc_signal<bool> *signal_irq_tims  = alloc_elems<sc_signal<bool> >("signal_irq_tim", nb_procs);
-    sc_signal<bool> *signal_irq_ttys  = alloc_elems<sc_signal<bool> >("signal_irq_tty", nb_procs);
-    sc_signal<bool> *signal_irq_dmas  = alloc_elems<sc_signal<bool> >("signal_irq_dma", nb_procs);
+    sc_signal<bool> *signal_irq_tims  = alloc_elems<sc_signal<bool> >("signal_irq_tim",  nb_procs);
+    sc_signal<bool> *signal_irq_ttys  = alloc_elems<sc_signal<bool> >("signal_irq_tty",  nb_procs);
+    sc_signal<bool> *signal_irq_dmas  = alloc_elems<sc_signal<bool> >("signal_irq_dma",  nb_procs);
 
     // sc_signal<bool> signal_irq_proc("signal_irq_proc");
     // sc_signal<bool> signal_irq_tim("signal_irq_tim");
@@ -307,8 +307,8 @@ int _main(int argc, char *argv[])
     //////////////////////////////////////////////////////////////
 
     //Loader loader(sys_path, app_path);
-    Loader    loader("soft/sys.bin",
-                     "soft/app.bin");
+    Loader    loader("soft_multi/sys.bin",
+                     "soft_multi/app.bin");
 
 
     // PROC
@@ -367,7 +367,7 @@ int _main(int argc, char *argv[])
     // icu = new VciIcu<vci_param>("icu", IntTab(TGTID_ICU), maptab, 4);
 
     VciMultiIcu<vci_param>* multi_icu;
-    multi_icu = new VciMultiIcu<vci_param>("multi_icu", IntTab(TGTID_ICU), maptab, 4 * nb_procs, nb_procs);
+    multi_icu = new VciMultiIcu<vci_param>("multi_icu", IntTab(TGTID_ICU), maptab, 4 * 4, nb_procs);
 
     // VciDma(
     //  sc_module_name name,   //  Component Name
@@ -402,7 +402,7 @@ int _main(int argc, char *argv[])
     //     const uint32_t latency = 0);  // initial access time (number of cycles)
 
     VciBlockDevice<vci_param>* ioc;
-    ioc = new VciBlockDevice<vci_param>("ioc", maptab, IntTab(SRCID_IOC), IntTab(TGTID_IOC), std::string(ioc_filename));
+    ioc = new VciBlockDevice<vci_param>("ioc", maptab, IntTab(nb_procs), IntTab(TGTID_IOC), std::string(ioc_filename));
 
     VciVgsb<vci_param>* bus;
     bus = new VciVgsb<vci_param>("vgsb", maptab, 2+nb_procs, 9);
@@ -477,14 +477,27 @@ int _main(int argc, char *argv[])
     {
         multi_icu->p_irq_out[i]               (signal_irq_procs[i]);
 
-        multi_icu->p_irq_in[0]                    (signal_irq_ioc);
-        if(nb_procs > 1 && i > 0)
+        if(i != 0)
+        {
             multi_icu->p_irq_in[i]                (signal_false);
-
-        multi_icu->p_irq_in[nb_procs + i]         (signal_irq_dmas[i]);
-        multi_icu->p_irq_in[2 * nb_procs + i]     (signal_irq_tims[i]);
-        multi_icu->p_irq_in[3 * nb_procs + i]     (signal_irq_ttys[i]);
+        }
+        multi_icu->p_irq_in[4 + i]            (signal_irq_dmas[i]);
+        multi_icu->p_irq_in[8 + i]            (signal_irq_tims[i]);
+        multi_icu->p_irq_in[12 + i]           (signal_irq_ttys[i]);
     }
+
+    if(nb_procs < 4)
+    {
+        for(int i = nb_procs ; i < 4; i++)
+        {
+            multi_icu->p_irq_in[i]                (signal_false);
+            multi_icu->p_irq_in[4 + i]            (signal_false);
+            multi_icu->p_irq_in[8 + i]            (signal_false);
+            multi_icu->p_irq_in[12 + i]           (signal_false);
+        }
+    }
+
+    multi_icu->p_irq_in[0]                (signal_irq_ioc);
 
     fbf->p_clk                      (signal_clk);
     fbf->p_resetn                   (signal_resetn);

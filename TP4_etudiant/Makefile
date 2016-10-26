@@ -6,6 +6,6 @@ multi : tp4_top_multi.desc tp4_top_multi.cpp
 	soclib-cc -m debug -P -p tp4_top_multi.desc -o simulator_multi.x
 
 clean:
-	rm -f *.o *.x core tmp *.deps stats trace simul*
+	rm -f *.o *.x core tmp *.deps stats trace simul* term_*
 	soclib-cc -x -X -P -p tp4_top_multi.desc  -o simulator_multi.x
 
