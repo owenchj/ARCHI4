@@ -21,7 +21,7 @@ __attribute__((constructor)) void main_display()
         }
         else
         {
-            ioc_completed();
+            while(ioc_completed());
             tty_printf("ioc_read  completed at date = %d \n",proctime());
         }
 
@@ -31,7 +31,7 @@ __attribute__((constructor)) void main_display()
             tty_printf("echec fb_write = %d\n", x);
         }
         else    {
-            fb_completed();
+            while(fb_completed());
             tty_printf("transfer completed at date = %d \n",proctime());
         }
 

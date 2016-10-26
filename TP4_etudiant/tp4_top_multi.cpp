@@ -99,9 +99,9 @@
 #define SEG_GCD_SIZE    0xF
 
 // SRCID definition
-#define SRCID_PROC      0
-#define SRCID_IOC       1
-#define SRCID_DMA       2
+// #define SRCID_PROC      0
+// #define SRCID_IOC       1
+// #define SRCID_DMA       2
 
 // TGTID definition
 #define TGTID_ROM       0

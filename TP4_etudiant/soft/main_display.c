@@ -1,44 +1,3 @@
-/* #include "stdio.h" */
-
-/* // 32 = 128*128/512 */
-/* #define NBLOCS 32 */
-
-/* __attribute__((constructor)) void main() */
-/* { */
-/*     unsigned int blk_index = 0; */
-/*     unsigned int ret = 0; */
-
-/*     unsigned char tab[128][128]; */
-
-/*     while(1) */
-/*     { */
-/*         ioc_read(blk_index, tab, NBLOCS); */
-
-/*         ret = 4; */
-/*         while(ret) */
-/*         { */
-/*             ret = ioc_completed(); */
-/*             if(ret == 1) */
-/*                 tty_printf("\n IOC address error\n"); */
-/*         } */
-
-/*         if(ret == 1) */
-/*         { */
-/*             break; */
-/*         } */
-/*         else */
-/*         { */
-/*             tty_puts("\nFirst Reading image complete\n"); */
-/*             fb_write(0, tab, 128*128); */
-/*             while(fb_completed() != 0); */
-
-/*             blk_index += NBLOCS; */
-/*             tty_puts("\nFirst displaying image complete\n"); */
-/*         } */
-/*     } */
-/*     exit(); */
-/* } // end main */
-
 #include "stdio.h"
 
 #define NBLOCS 32
@@ -62,7 +21,7 @@ __attribute__((constructor)) void main()
         }
         else
         {
-            ioc_completed();
+            while(ioc_completed());
             tty_printf("ioc_read  completed at date = %d \n",proctime());
         }
 
@@ -72,7 +31,7 @@ __attribute__((constructor)) void main()
             tty_printf("echec fb_write = %d\n", x);
         }
         else    {
-            fb_completed();
+            while(fb_completed());
             tty_printf("transfer completed at date = %d \n",proctime());
         }
 
