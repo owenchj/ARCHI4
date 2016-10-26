@@ -41,6 +41,7 @@ reset:
     la      $27,    _isr_ioc
     sw      $27,    0($26)              # interrupt_vector[0] <= _isr_ioc
 
+    la      $27,    _isr_dma
     sw      $27,    16($26)             # interrupt_vector[4] <= _isr_dma
     sw      $27,    20($26)             # interrupt_vector[5] <= _isr_dma
     sw      $27,    24($26)             # interrupt_vector[6] <= _isr_dma
@@ -61,7 +62,8 @@ reset:
 # initializes ICU
     la      $26,    seg_icu_base
     addu    $26,    $26,    $11         # $26 <= seg_icu_base + proc_id*0x01000000
-    li      $27,    0xF                 # IRQ[0] IRQ[1] IRQ[2] IRQ[3]
+    li      $27,    0x1111
+    sll     $27,    $27,    $10
     sw      $27,    8($26)              # ICU_MASK_SET
 
 # initializes SR register
