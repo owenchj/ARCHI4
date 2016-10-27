@@ -30,7 +30,7 @@ reset:
 # initializes stack pointer
     la	    $27,    seg_stack_base
     mfc0    $26,    $15,    1
-    andi    $10,    $26,    0x7         # $10 <= proc_id
+    andi    $10,    $26,    0x3         # $10 <= proc_id
     sll     $11,    $26,    24          # $11 <= proc_id * 0x01000000
     addu    $27,    $27,    $11         # $27 <= seg_stack_base + proc_id*0x01000000
     li      $26,    0x10000             # $26 <= 64K
@@ -48,8 +48,8 @@ reset:
     sw      $27,    28($26)             # interrupt_vector[7] <= _isr_dma
 
     la      $27,    _isr_timer
-    sw      $27,    32($26)              # interrupt_vector[8] <= _isr_timer
-    sw      $27,    36($26)              # interrupt_vector[9] <= _isr_timer
+    sw      $27,    32($26)              # interrupt_vector[8]  <= _isr_timer
+    sw      $27,    36($26)              # interrupt_vector[9]  <= _isr_timer
     sw      $27,    40($26)              # interrupt_vector[10] <= _isr_timer
     sw      $27,    44($26)              # interrupt_vector[11] <= _isr_timer
 
@@ -61,7 +61,10 @@ reset:
 
 # initializes ICU
     la      $26,    seg_icu_base
-    addu    $26,    $26,    $11         # $26 <= seg_icu_base + proc_id*0x01000000
+    li      $27,    0x20
+    mult    $10,    $27
+    mflo    $27
+    addu    $26,    $26,    $27         # $26 <= seg_icu_base + proc_id* (5 << 2)
     li      $27,    0x1111
     sll     $27,    $27,    $10
     sw      $27,    8($26)              # ICU_MASK_SET

@@ -556,6 +556,7 @@ int _main(int argc, char *argv[])
             timer->print_trace();
             rom->print_trace();
             ram->print_trace();
+            multi_icu->print_trace();
             for(int i = 0 ; i < nb_procs; i++)
             {
                 procs[i]->print_trace(1);
