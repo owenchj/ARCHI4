@@ -1,76 +1,39 @@
 #include "stdio.h"
 
-/*
- * 0x0 : Timer not activated
- * 0x1 : Timer activated, but no interrupt is generated
- * 0x3 : Timer activarted and periodic interrupts generated
- */
-#define not_active_mode  0x0
-#define active_mode      0x1
-#define active_irq_mode  0x3
-
-#define timer_period 500000
+#define NBLOCS 32
 
 __attribute__((constructor)) void main()
 {
-    unsigned int ret;
+    char            buf_in[128*128];
+    int             x;
+    int             base = 0;
 
-    /* ret = timer_set_period(timer_period); */
-    /* if(ret) */
-    /* { */
-    /*     tty_printf("\ntimer_set_period error\n"); */
-    /* } */
-
-    /* ret = timer_set_mode(active_irq_mode); */
-    /* if(ret) */
-    /* { */
-    /*     tty_printf("\ntimer_set_mode error\n"); */
-    /* } */
-
-    char byte;
-    while(1)
+    while(base < 5*NBLOCS)
     {
-        tty_getc_irq(&byte);
+        tty_printf("\n *** image %d *** at time = %d \n", base/NBLOCS, proctime());
 
-        if(byte == 'a')
-        {
-            ret = timer_set_period(timer_period);
-            if(ret)
-            {
-                tty_printf("\ntimer_set_period error\n");
-            }
-
-            ret = timer_set_mode(active_irq_mode);
-            if(ret)
-            {
-                tty_printf("\ntimer_set_mode error\n");
-            }
-
-            tty_puts("\nTime in active irq mode, with period 500000\n");
+/* Phase 1 : lecture image sur le disque et transfert vers buf_in */
+        x = ioc_read(base, buf_in, NBLOCS);
+        if(x)   {
+            tty_printf("echec ioc_read = %d\n", x);
         }
-        else if(byte == 'd')
+        else
         {
-            ret = timer_reset_irq();
-            if(ret)
-            {
-                tty_printf("\ntimer_reset_irq error\n");
-            }
-
-            ret = timer_set_mode(active_mode);
-            if(ret)
-            {
-                tty_printf("\ntimer_set_mode error\n");
-            }
-
-            tty_puts("\nTime not in active mode\n");
-        }
-        else if(byte == 'q')
-        {
-            tty_puts("\nQuit\n");
-            break;
+            while(ioc_completed());
+            tty_printf("ioc_read  completed at time = %d \n",proctime());
         }
 
-    }
+/* Phase 2 : transfert de buf_out vers le frame buffer par dma */
+        x = fb_write(0,buf_in,128*128);
+        if(x)   {
+            tty_printf("echec fb_write = %d\n", x);
+        }
+        else    {
+            while(fb_completed());
+                tty_printf("transfer completed at time = %d \n",proctime());
+        }
 
+        base = base + NBLOCS;
+    } // end while
     exit();
 } // end main

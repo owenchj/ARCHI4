@@ -75,7 +75,7 @@
 
 // 2 processors
 #define SEG_STACK_BASE  0x02000000
-#define SEG_STACK_SIZE  0x01000000 * 2
+#define SEG_STACK_SIZE  0x01000000 
 
 #define SEG_TTY_BASE    0x90000000
 #define SEG_TTY_SIZE    0x100
@@ -93,7 +93,7 @@
 #define SEG_FBF_SIZE    0x0
 
 #define SEG_ICU_BASE    0x9F000000
-#define SEG_ICU_SIZE    0x50
+#define SEG_ICU_SIZE    0x80
 
 #define SEG_GCD_BASE    0x95000000
 #define SEG_GCD_SIZE    0xF
@@ -380,7 +380,7 @@ int _main(int argc, char *argv[])
     // dma = new VciDma<vci_param>("dma", maptab, nb_procs, IntTab(TGTID_DMA), plen_size);
 
     VciMultiDma<vci_param>* multi_dma;
-    multi_dma = new VciMultiDma<vci_param>("multi_dma", maptab, nb_procs+1, IntTab(TGTID_DMA), plen_size, nb_procs);
+    multi_dma = new VciMultiDma<vci_param>("multi_dma", maptab, nb_procs+1, IntTab(TGTID_DMA), plen_size * cell_size, nb_procs);
 
     // VciFrameBuffer(
     //  sc_module_name name,   // Instance name
@@ -556,7 +556,8 @@ int _main(int argc, char *argv[])
             timer->print_trace();
             rom->print_trace();
             ram->print_trace();
-            multi_icu->print_trace();
+            fbf->print_trace();
+            //multi_icu->print_trace();
             for(int i = 0 ; i < nb_procs; i++)
             {
                 procs[i]->print_trace(1);

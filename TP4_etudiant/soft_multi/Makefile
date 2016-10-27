@@ -14,7 +14,9 @@ SYS_OBJS=  reset.o \
 
 APP_OBJS=  stdio.o \
 	   main.o  \
-	   main_display.o 
+	   main_display.o \
+	   main_0.o \
+	   main_1.o 
 
 GIET_SYS_PATH= /users/enseig/alain/giet_2011/sys
 GIET_APP_PATH= /users/enseig/alain/giet_2011/app
@@ -78,6 +80,16 @@ main.o: main.c
 main_display.o: main_display.c
 	$(CC) $(CFLAGS) -I$(GIET_APP_PATH) -I. -c -o $@ $<
 	$(DU) -D $@ > $@.txt
+
+main_0.o: main_0.c
+	$(CC) $(CFLAGS) -I$(GIET_APP_PATH) -I. -c -o $@ $<
+	$(DU) -D $@ > $@.txt
+
+
+main_1.o: main_1.c
+	$(CC) $(CFLAGS) -I$(GIET_APP_PATH) -I. -c -o $@ $<
+	$(DU) -D $@ > $@.txt
+
 
 clean:
 	rm -f *.o *.bin *.txt core *~

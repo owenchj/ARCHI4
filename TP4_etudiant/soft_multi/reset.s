@@ -31,10 +31,10 @@ reset:
     la	    $27,    seg_stack_base
     mfc0    $26,    $15,    1
     andi    $10,    $26,    0x3         # $10 <= proc_id
-    sll     $11,    $26,    24          # $11 <= proc_id * 0x01000000
-    addu    $27,    $27,    $11         # $27 <= seg_stack_base + proc_id*0x01000000
+    sll     $11,    $10,    16          # $11 <= proc_id * 64k
+    addu    $27,    $27,    $11         # $27 <= seg_stack_base + proc_id* 64k
     li      $26,    0x10000             # $26 <= 64K
-    addu    $29,    $26, $27		# $29 <= seg_stack_base + proc_id*0x01000000 + 64K
+    addu    $29,    $26, $27		# $29 <= seg_stack_base + proc_id*64K + 64K
 
 # initializes interrupt vector
     la      $26,    _interrupt_vector       # interrupt vector address
