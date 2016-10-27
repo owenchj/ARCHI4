@@ -29,8 +29,8 @@ reset:
 
 # initializes stack pointer
     la	    $27,    seg_stack_base
-    li	    $26,    0x4000000		# $26 <= 64 M
-    addu    $29,    $26, $27		# $29 <= seg_stack_base + 64 M
+    li	    $26,    0x10000		# $26 <= 64 k
+    addu    $29,    $26, $27		# $29 <= seg_stack_base + 64 k
 
 # initializes interrupt vector
     la      $26,    _interrupt_vector   # interrupt vector address
