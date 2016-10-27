@@ -1,7 +1,6 @@
 #include "stdio.h"
 
 #define NBLOCS 32
-#define THRESHOLD 200
 
 
 __attribute__((constructor)) void main()

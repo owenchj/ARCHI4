@@ -85,7 +85,7 @@
 #define SEG_DMA_SIZE    0x14
 
 #define SEG_FBF_BASE    0x96000000
-#define SEG_FBF_SIZE    0x0
+#define SEG_FBF_SIZE    0x4000
 
 #define SEG_ICU_BASE    0x9F000000
 #define SEG_ICU_SIZE    0x14

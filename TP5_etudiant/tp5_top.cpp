@@ -50,6 +50,8 @@
 #include "vci_block_device.h"
 #include "vci_framebuffer.h"
 #include "vci_simple_ram.h"
+// Gdb server
+#include "gdbserver.h"
 
 #define SEG_RESET_BASE  0xBFC00000
 #define SEG_RESET_SIZE  0x00001000
@@ -85,13 +87,13 @@
 #define SEG_DMA_SIZE    0x14
 
 #define SEG_FBF_BASE    0x96000000
-#define SEG_FBF_SIZE    0x0
+#define SEG_FBF_SIZE    0x4000
 
 #define SEG_ICU_BASE    0x9F000000
 #define SEG_ICU_SIZE    0x14
 
 #define SEG_GCD_BASE    0x95000000
-#define SEG_GCD_SIZE    0xF
+#define SEG_GCD_SIZE    0xFF
 
 // SRCID definition
 #define SRCID_PROC      0
@@ -150,8 +152,8 @@ int _main(int argc, char *argv[])
     // command line arguments
     ///////////////////////////////////////////////////////////////
     int     ncycles             = 1000000000;       // simulated cycles
-    char    sys_path[256]       = "soft/sys_bin";   // pathname for system code
-    char    app_path[256]       = "soft/app_bin";   // pathname for application code
+    char    sys_path[256]       = "soft_gcd/sys_bin";   // pathname for system code
+    char    app_path[256]       = "soft_gcd/app_bin";   // pathname for application code
     char    ioc_filename[256]   = "images.raw";     // pathname for the ioc file
     size_t  fbf_size            = 128;              // number of lines = number of pixels
     bool    debug               = false;            // debug activated
@@ -281,11 +283,10 @@ int _main(int argc, char *argv[])
     //////////////////////////////////////////////////////////////
 
     //Loader loader(sys_path, app_path);
-    Loader    loader("soft/sys.bin",
-                     "soft/app.bin");
+    Loader    loader(sys_path, app_path);
 
-    VciXcacheWrapper<vci_param, Mips32ElIss >* proc;
-    proc = new VciXcacheWrapper<vci_param,Mips32ElIss>("proc", 0,maptab,IntTab(SRCID_PROC),
+    VciXcacheWrapper<vci_param, GdbServer<Mips32ElIss> >* proc;
+    proc = new VciXcacheWrapper<vci_param, GdbServer<Mips32ElIss> >("proc", 0,maptab,IntTab(SRCID_PROC),
                                                     icache_ways, icache_sets, icache_words,
                                                     dcache_ways, dcache_sets, dcache_words);
 
