@@ -73,24 +73,25 @@
 #define SEG_CODE_BASE   0x00400000
 #define SEG_CODE_SIZE   0x00004000
 
-// 2 processors
 #define SEG_STACK_BASE  0x02000000
-#define SEG_STACK_SIZE  0x01000000 
+#define SEG_STACK_SIZE  0x01000000
 
 #define SEG_TTY_BASE    0x90000000
 #define SEG_TTY_SIZE    0x100
 
 #define SEG_TIM_BASE    0x91000000
-#define SEG_TIM_SIZE    0x40
+#define SEG_TIM_SIZE    0x80
 
 #define SEG_IOC_BASE    0x92000000
-#define SEG_IOC_SIZE    0x24
+#define SEG_IOC_SIZE    0x80
 
+// 4 * 8 * 4 = 0x80
 #define SEG_DMA_BASE    0x93000000
-#define SEG_DMA_SIZE    0x50
+#define SEG_DMA_SIZE    0x80
 
+// 128 * 128 = 2^14
 #define SEG_FBF_BASE    0x96000000
-#define SEG_FBF_SIZE    0x0
+#define SEG_FBF_SIZE    0x4000
 
 #define SEG_ICU_BASE    0x9F000000
 #define SEG_ICU_SIZE    0x80
