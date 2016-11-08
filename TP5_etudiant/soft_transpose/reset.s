@@ -71,21 +71,14 @@ reset:
     mtc0    $26,    $12			# SR <= user mode / IRQ enable (after eret)
 
 # jumps to main
-    la      $26,    tab_main
+    la      $26,    seg_data_base
     sll     $27,    $10,    2           # $27 <= proc_id*4
-    addu    $26,    $26,    $27         # $26 <= &tab_main[proc_id]
-    lw      $27,    0($26)              # $27 <= tab_main[proc_id]
-    mtc0    $27,    $14                 # EPC <= tab_main[proc_id]
-
-# jumps to main
+    addu    $26,    $26,    $27         # $26 <= seg_data_base + proc_id * 4
+    lw      $27,    0($26)
+    mtc0    $27,    $14
     eret
 
 	.end	reset
 	.size	reset, .-reset
 
 	.set reorder
-
-tab_main:
-        .word   load
-        .word   transpose
-        .word   display
