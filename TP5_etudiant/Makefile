@@ -10,6 +10,6 @@ clean_mono :
 	rm -f *.o *.x core tmp *.deps stats trace simulator.x
 
 clean_cluster :
-	soclib cc -x -X -P -p tp5_cluster_top.desc        
+	soclib-cc -x -X -P -p tp5_cluster_top.desc        
 	rm -f *.o *.x core tmp *.deps stats trace simulator_cluster.x
 

@@ -67,7 +67,7 @@
 #define SEG_KERNEL_BASE  0x80000000    // cluster 0 / tgt 0 / protected
 #define SEG_KERNEL_SIZE  0x00004000
 
-#define SEG_KDATA_BASE   0x8200000     // cluster 0 / tgt 0 / protected
+#define SEG_KDATA_BASE   0x82000000     // cluster 0 / tgt 0 / protected
 #define SEG_KDATA_SIZE   0x00004000
 
 #define SEG_KUNC_BASE    0x83000000    // cluster 0 / tgt 0 / protected
@@ -104,7 +104,7 @@
 #define SEG_ICU_SIZE     0x00001000
 
 #define SEG_RESET_BASE   0xBFC00000    // cluster 3 / tgt 2 / protected
-#define SEG_RESET_SIZE     0x00010000
+#define SEG_RESET_SIZE   0x00010000
 
 // SRCID.LID  definition
 // IOC and DMA are in different clusters
@@ -131,7 +131,7 @@
 #define rerror_size     1
 #define clen_size       1
 #define rflag_size      1
-#define srcid_size      12
+#define srcid_size      3
 #define pktid_size      1
 #define trdid_size      4
 #define wrplen_size     1
@@ -235,7 +235,7 @@ int _main(int argc, char *argv[])
     //////////////////////////////////////////////////////////////////////////
     // Mapping Table
     //////////////////////////////////////////////////////////////////////////
-    MappingTable maptab(32, IntTab(4,4), IntTab(2,1), 0xFFF00000);
+    MappingTable maptab(32, IntTab(4,4), IntTab(2,1), 0xFF000000);
 
     maptab.add(Segment("seg_kernel", SEG_KERNEL_BASE, SEG_KERNEL_SIZE, IntTab(0,TGTID_RAM), true));
     maptab.add(Segment("seg_kdata" , SEG_KDATA_BASE , SEG_KDATA_SIZE , IntTab(0,TGTID_RAM), true));
@@ -254,7 +254,7 @@ int _main(int argc, char *argv[])
     maptab.add(Segment("seg_ioc"   , SEG_IOC_BASE   , SEG_IOC_SIZE   , IntTab(0,TGTID_IOC), false));
     maptab.add(Segment("seg_dma"   , SEG_DMA_BASE   , SEG_DMA_SIZE   , IntTab(1,TGTID_DMA), false));
     maptab.add(Segment("seg_fbf"   , SEG_FBF_BASE   , SEG_FBF_SIZE   , IntTab(2,TGTID_FBF), false));
-    maptab.add(Segment("seg_reset"   , SEG_RESET_BASE   , SEG_RESET_SIZE   , IntTab(3,TGTID_ROM), true));
+    maptab.add(Segment("seg_reset" , SEG_RESET_BASE , SEG_RESET_SIZE , IntTab(3,TGTID_ROM), true));
 
     std::cout << std::endl << maptab << std::endl;
 
