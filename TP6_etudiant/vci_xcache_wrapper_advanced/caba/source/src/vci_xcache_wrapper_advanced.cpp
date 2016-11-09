@@ -549,7 +549,7 @@ tmpl(void)::transition()
     //////////////////////
     case DCACHE_WRITE_REQ:  // only cacheable write are written in wbuf
     {
-        if( TO BE COMPLETED )
+        if( not r_wbuf.wok( r_dcache_addr_save ) )
         {
             //  stay in DCACHE_WRITEREQ state if the request is not accepted 
             m_cost_write_frz++;
@@ -577,7 +577,11 @@ tmpl(void)::transition()
             dcache_cacheable	= m_cacheability_table[(uint64_t)m_dreq.addr];
 
             // dcache_hit, dcache_way, dcache_set, dcache_word & dcache_rdata evaluation
-            dcache_hit 		    = r_dcache.read( TO BE COMPLETED )
+            dcache_hit 		= r_dcache.read( m_dreq.addr,
+                                                 &dcache_rdata,
+                                                 &dcache_ways,
+                                                 &dcache_set,
+                                                 &dcache_word);
 
             // Save proc request and cache response
             r_dcache_addr_save      = m_dreq.addr;
