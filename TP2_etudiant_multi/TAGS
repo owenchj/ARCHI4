@@ -1,0 +1,484 @@
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/vci_param.h,3104
+#define SOCLIB_CABA_SIGNAL_VCI_PARAM_H_29,983
+    int cell_size,60,1600
+    int plen_size,61,1619
+    int addr_size,62,1638
+    int rerror_size,63,1657
+    int clen_size,64,1678
+    int rflag_size,65,1697
+    int srcid_size,66,1717
+    int pktid_size,67,1737
+    int trdid_size,68,1757
+class VciParams71,1803
+    static const int B VciParams::B91,2406
+    static const int K VciParams::K92,2442
+    static const int N VciParams::N93,2478
+    static const int E VciParams::E94,2514
+    static const int Q VciParams::Q95,2552
+    static const int F VciParams::F96,2588
+    static const int S VciParams::S97,2625
+    static const int P VciParams::P98,2662
+    static const int T VciParams::T99,2699
+    static const int W VciParams::W100,2736
+	typedef bool ack_t;VciParams::ack_t104,2825
+	typedef bool val_t;VciParams::val_t105,2846
+	typedef sc_dt::sc_uint<N> addr_t;VciParams::addr_t107,2890
+	typedef sc_dt::sc_uint<B> be_t;VciParams::be_t108,2925
+	typedef bool cfixed_t;VciParams::cfixed_t109,2958
+	typedef sc_dt::sc_uint<Q> clen_t;VciParams::clen_t110,2982
+	typedef sc_dt::sc_uint<2> cmd_t;VciParams::cmd_t111,3017
+	typedef bool contig_t;VciParams::contig_t112,3051
+	typedef sc_dt::sc_uint<B*8> data_t;VciParams::data_t113,3075
+	typedef bool eop_t;VciParams::eop_t114,3112
+	typedef bool const_t;VciParams::const_t115,3133
+	typedef sc_dt::sc_uint<K> plen_t;VciParams::plen_t116,3156
+	typedef bool wrap_t;VciParams::wrap_t117,3191
+	typedef sc_dt::sc_uint<E> rerror_t;VciParams::rerror_t119,3237
+	typedef bool defd_t;VciParams::defd_t123,3331
+	typedef sc_dt::sc_uint<W> wrplen_t;VciParams::wrplen_t124,3353
+	typedef sc_dt::sc_uint<F> rflag_t;VciParams::rflag_t126,3414
+	typedef sc_dt::sc_uint<S> srcid_t;VciParams::srcid_t128,3467
+	typedef sc_dt::sc_uint<T> trdid_t;VciParams::trdid_t129,3503
+	typedef sc_dt::sc_uint<P> pktid_t;VciParams::pktid_t130,3539
+        CMD_NOP,VciParams::CMD_NOP138,3882
+        CMD_READ,VciParams::CMD_READ139,3899
+        CMD_WRITE,VciParams::CMD_WRITE140,3917
+        CMD_LOCKED_READ,VciParams::CMD_LOCKED_READ141,3936
+        CMD_STORE_COND VciParams::CMD_STORE_COND142,3961
+        CMD_STORE_COND = CMD_NOP,VciParams::CMD_NOP142,3961
+    static const unsigned int _err_mask VciParams::_err_mask145,4003
+        ERR_NORMAL VciParams::ERR_NORMAL147,4084
+        ERR_NORMAL = 0 & _err_mask,VciParams::_err_mask147,4084
+        ERR_GENERAL_DATA_ERROR VciParams::ERR_GENERAL_DATA_ERROR148,4120
+        ERR_GENERAL_DATA_ERROR = 1 & _err_mask,VciParams::_err_mask148,4120
+        ERR_BAD_DATA VciParams::ERR_BAD_DATA149,4168
+        ERR_BAD_DATA = 5 & _err_mask,VciParams::_err_mask149,4168
+        ERR_ABORT_DISCONNECT VciParams::ERR_ABORT_DISCONNECT150,4206
+        ERR_ABORT_DISCONNECT = 7 & _err_mask,VciParams::_err_mask150,4206
+    } vci_error_e;VciParams::vci_error_e151,4252
+        STORE_COND_ATOMIC VciParams::STORE_COND_ATOMIC154,4283
+        STORE_COND_NOT_ATOMIC VciParams::STORE_COND_NOT_ATOMIC155,4314
+    static std::string string(VciParams::string158,4357
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/vci_gcd_master.cpp,337
+namespace soclib 38,1066
+namespace soclib { namespace caba soclib::caba38,1066
+VciGcdMaster<vci_param>::VciGcdMaster(soclib::caba::VciGcdMaster42,1161
+VciGcdMaster<vci_param>::~VciGcdMaster(~VciGcdMaster72,1861
+void VciGcdMaster<vci_param>::transition(transition78,1970
+void VciGcdMaster<vci_param>::genMoore(genMoore171,4065
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/tp2_simple_top.cpp,126
+#define GCD_BASE	10,175
+#define GCD_SIZE	11,211
+int sc_main(13,249
+	typedef VciParams< TO BE COMPLETED > vci_param;31,627
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/vci_initiator.h,2647
+#define SOCLIB_CABA_SIGNAL_VCI_INITIATOR_H_29,966
+class VciInitiator43,1202
+	sc_out<typename vci_param::ack_t>     rspack;VciInitiator::rspack46,1231
+	sc_in<typename vci_param::val_t>      rspval;VciInitiator::rspval47,1278
+	sc_in<typename vci_param::data_t>     rdata;VciInitiator::rdata48,1325
+	sc_in<bool>                           reop;VciInitiator::reop49,1371
+	sc_in<typename vci_param::rerror_t>   rerror;VciInitiator::rerror50,1416
+	sc_in<typename vci_param::srcid_t>    rsrcid;VciInitiator::rsrcid51,1463
+	sc_in<typename vci_param::trdid_t >   rtrdid;VciInitiator::rtrdid52,1510
+	sc_in<typename vci_param::pktid_t >   rpktid;VciInitiator::rpktid53,1557
+	sc_in<typename vci_param::ack_t>      cmdack;VciInitiator::cmdack55,1605
+	sc_out<typename vci_param::val_t>     cmdval;VciInitiator::cmdval56,1652
+	sc_out<typename vci_param::addr_t>    address;VciInitiator::address57,1699
+	sc_out<typename vci_param::be_t>      be;VciInitiator::be58,1747
+	sc_out<typename vci_param::cmd_t>     cmd;VciInitiator::cmd59,1790
+	sc_out<typename vci_param::contig_t>  contig;VciInitiator::contig60,1834
+	sc_out<typename vci_param::data_t>    wdata;VciInitiator::wdata61,1881
+	sc_out<typename vci_param::eop_t>     eop;VciInitiator::eop62,1927
+	sc_out<typename vci_param::const_t>   cons;VciInitiator::cons63,1971
+	sc_out<typename vci_param::plen_t>    plen;VciInitiator::plen64,2016
+	sc_out<typename vci_param::wrap_t>    wrap;VciInitiator::wrap65,2061
+	sc_out<typename vci_param::cfixed_t>  cfixed;VciInitiator::cfixed66,2106
+	sc_out<typename vci_param::clen_t>    clen;VciInitiator::clen67,2153
+	sc_out<typename vci_param::srcid_t>   srcid;VciInitiator::srcid68,2198
+	sc_out<typename vci_param::trdid_t>   trdid;VciInitiator::trdid69,2244
+	sc_out<typename vci_param::pktid_t>   pktid;VciInitiator::pktid70,2290
+#define __ren(72,2337
+    VciInitiator(VciInitiator::VciInitiator73,2379
+#undef __ren100,3034
+	void operator()(VciInitiator::operator()102,3048
+	void operator()(VciInitiator::operator()130,3652
+    inline bool getAck(VciInitiator::getAck158,4308
+    inline bool getVal(VciInitiator::getVal163,4375
+    inline void setAck(VciInitiator::setAck168,4442
+    inline void setVal(VciInitiator::setVal173,4508
+    inline bool iProposed(VciInitiator::iProposed178,4574
+    inline bool iAccepted(VciInitiator::iAccepted183,4644
+    inline bool peerAccepted(VciInitiator::peerAccepted188,4724
+    inline bool toPeerEnd(VciInitiator::toPeerEnd193,4807
+    void cmdNop(VciInitiator::cmdNop198,4892
+    friend sc_core::sc_sensitive &operator <<(VciInitiator::operator <<203,4947
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/segment.cpp,189
+namespace soclib 30,984
+namespace soclib { namespace common soclib::common30,984
+bool Segment::isOverlapping(soclib::common::Segment::isOverlapping32,1023
+void Segment::print(43,1333
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/address_masking_table.cpp,316
+namespace soclib 31,955
+namespace soclib { namespace common soclib::common31,955
+#define tmpl(33,994
+tmpl(soclib::common::tmpl35,1067
+tmpl(42,1201
+tmpl(47,1252
+tmpl(52,1348
+tmpl(70,1661
+tmpl(75,1772
+tmpl(const AddressMaskingTable<data_t> &)::operator=(operator=75,1772
+tmpl(84,1961
+#undef tmpl90,2147
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/exception.h,648
+#define SOCLIB_EXCEPTION_H_30,951
+class Exception38,1082
+    std::string m_type;Exception::m_type41,1128
+    std::string m_message;Exception::m_message42,1152
+    Exception(Exception::Exception45,1188
+    virtual ~Exception(Exception::~Exception50,1327
+    virtual const char * what(Exception::what54,1373
+    void print(Exception::print59,1466
+    friend std::ostream &operator << Exception::operator <<64,1594
+class ValueError71,1723
+    ValueError(ValueError::ValueError75,1773
+class Collision80,1878
+    Collision(Collision::Collision84,1927
+class RunTimeError89,2030
+    RunTimeError(RunTimeError::RunTimeError93,2082
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/address_decoding_table.h,687
+#define SOCLIB_ADDRESS_DECODING_TABLE_H29,962
+class AddressDecodingTable36,1110
+    int m_use_bits,38,1139
+    int m_use_bits, m_drop_bits;38,1139
+    input_t m_low_mask;39,1172
+    output_t *m_table;m_table40,1196
+    void init(42,1220
+    inline input_t mask(44,1267
+    inline int id(49,1352
+    AddressDecodingTable(55,1458
+    AddressDecodingTable(56,1486
+    AddressDecodingTable(57,1543
+    void reset(58,1585
+    void set(59,1623
+    AddressDecodingTable(60,1670
+    const AddressDecodingTable<input_t,input_t61,1731
+    ~AddressDecodingTable(62,1828
+    bool isAllBelow(63,1857
+    friend std::ostream &operator << AddressDecodingTable::operator <<72,2042
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/vci_signals.h,2270
+#define SOCLIB_CABA_SIGNAL_VCI_SIGNALS_H_29,964
+class VciSignals41,1165
+	sc_core::sc_signal<typename vci_param::ack_t>     rspack;VciSignals::rspack44,1192
+	sc_core::sc_signal<typename vci_param::val_t>     rspval;VciSignals::rspval45,1251
+	sc_core::sc_signal<typename vci_param::data_t>    rdata;VciSignals::rdata46,1310
+	sc_core::sc_signal<bool>                          reop;VciSignals::reop47,1368
+	sc_core::sc_signal<typename vci_param::rerror_t>  rerror;VciSignals::rerror48,1425
+	sc_core::sc_signal<typename vci_param::srcid_t>   rsrcid;VciSignals::rsrcid49,1484
+	sc_core::sc_signal<typename vci_param::trdid_t >  rtrdid;VciSignals::rtrdid50,1543
+	sc_core::sc_signal<typename vci_param::pktid_t >  rpktid;VciSignals::rpktid51,1602
+	sc_core::sc_signal<typename vci_param::ack_t>     cmdack;VciSignals::cmdack53,1662
+	sc_core::sc_signal<typename vci_param::val_t>     cmdval;VciSignals::cmdval54,1721
+	sc_core::sc_signal<typename vci_param::addr_t>    address;VciSignals::address55,1780
+	sc_core::sc_signal<typename vci_param::be_t>      be;VciSignals::be56,1840
+	sc_core::sc_signal<typename vci_param::cmd_t>     cmd;VciSignals::cmd57,1895
+	sc_core::sc_signal<typename vci_param::contig_t>  contig;VciSignals::contig58,1951
+	sc_core::sc_signal<typename vci_param::data_t>    wdata;VciSignals::wdata59,2010
+	sc_core::sc_signal<typename vci_param::eop_t>     eop;VciSignals::eop60,2068
+	sc_core::sc_signal<typename vci_param::const_t>   cons;VciSignals::cons61,2124
+	sc_core::sc_signal<typename vci_param::plen_t>    plen;VciSignals::plen62,2181
+	sc_core::sc_signal<typename vci_param::wrap_t>    wrap;VciSignals::wrap63,2238
+	sc_core::sc_signal<typename vci_param::cfixed_t>  cfixed;VciSignals::cfixed64,2295
+	sc_core::sc_signal<typename vci_param::clen_t>    clen;VciSignals::clen65,2354
+	sc_core::sc_signal<typename vci_param::srcid_t>   srcid;VciSignals::srcid66,2411
+	sc_core::sc_signal<typename vci_param::trdid_t>   trdid;VciSignals::trdid67,2469
+	sc_core::sc_signal<typename vci_param::pktid_t>   pktid;VciSignals::pktid68,2527
+#define ren(70,2587
+    VciSignals(VciSignals::VciSignals72,2645
+#undef ren99,3292
+    void trace(VciSignals::trace101,3304
+#define __trace(103,3380
+#undef __trace128,4037
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/alloc_elems.h,282
+#define SOCLIB_ALLOC_ELEMS_H_29,952
+elem_t **alloc_elems(alloc_elems50,1390
+elem_t ***alloc_elems(alloc_elems65,1857
+elem_t ****alloc_elems(alloc_elems83,2461
+void dealloc_elems(104,3207
+void dealloc_elems(112,3350
+void dealloc_elems(123,3594
+void dealloc_elems(137,3921
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/gcd.h,153
+#define GCD_REGS_H2,19
+enum SoclibLcdRegisters 4,39
+    GCD_OPA 5,65
+    GCD_OPB 6,82
+    GCD_START 7,99
+    GCD_STATUS 8,119
+    GCD_SPAN 10,148
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/vci_vgsb.h,975
+#define VCI_VGSB_H73,3371
+class VciVgsb 86,3643
+	enum vgsb_fms_state_e 90,3705
+	FSM_IDLE,91,3730
+	FSM_CMD,92,3741
+	FSM_RSP,93,3751
+	sc_signal<int> 							r_fsm;97,3780
+	sc_signal<size_t>						r_initiator_index;98,3810
+	sc_signal<size_t>						r_target_index;99,3853
+	sc_signal<uint32_t>						**r_vci_counter;r_vci_counter100,3893
+	const soclib::common::AddressDecodingTable<VciVgsb::soclib::common::AddressDecodingTable103,3953
+	const soclib::common::AddressDecodingTable<uint32_t, int> 	m_routing_table;VciVgsb::m_routing_table103,3953
+	const size_t 							m_nb_initiator;VciVgsb::m_nb_initiator104,4030
+	const size_t 							m_nb_target;VciVgsb::m_nb_target105,4068
+	sc_in<bool>  							p_clk;VciVgsb::p_clk114,4161
+	sc_in<bool>  							p_resetn;VciVgsb::p_resetn115,4191
+	soclib::caba::VciInitiator<vci_param> 				*p_to_target;VciVgsb::p_to_target116,4224
+	soclib::caba::VciTarget<vci_param>    				*p_to_initiator;VciVgsb::p_to_initiator117,4281
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/vci_gcd_coprocessor.h,1352
+#define VCI_GCD_COPROCESSOR_H30,959
+class VciGcdCoprocessor45,1225
+	enum gcd_coproc_vci_fsm_state_e 48,1280
+		VCI_GET_CMD,49,1315
+		VCI_RSP_OPA,50,1330
+		VCI_RSP_OPB,51,1345
+		VCI_RSP_START,52,1360
+		VCI_RSP_STATUS,53,1377
+		VCI_RSP_RESULT,54,1395
+	enum gcd_coproc_exe_fsm_state_e 56,1417
+		EXE_IDLE,57,1452
+		EXE_COMPARE,58,1464
+		EXE_DECA,59,1479
+		EXE_DECB,60,1491
+	sc_core::sc_signal<int>					r_vci_fsm;VciGcdCoprocessor::r_vci_fsm64,1522
+	sc_core::sc_signal<int>					r_exe_fsm;VciGcdCoprocessor::r_exe_fsm65,1562
+        sc_core::sc_signal<typename vci_param::srcid_t> 	r_srcid;VciGcdCoprocessor::r_srcid66,1602
+        sc_core::sc_signal<typename vci_param::trdid_t> 	r_trdid;VciGcdCoprocessor::r_trdid67,1668
+        sc_core::sc_signal<typename vci_param::pktid_t> 	r_pktid;VciGcdCoprocessor::r_pktid68,1734
+        sc_core::sc_signal<typename vci_param::data_t>   	r_opa;VciGcdCoprocessor::r_opa69,1800
+        sc_core::sc_signal<typename vci_param::data_t>   	r_opb;VciGcdCoprocessor::r_opb70,1865
+	soclib::common::Segment 				m_segment;VciGcdCoprocessor::m_segment72,1931
+        sc_core::sc_in<bool> 					p_resetn;VciGcdCoprocessor::p_resetn79,2038
+        sc_core::sc_in<bool> 					p_clk;VciGcdCoprocessor::p_clk80,2082
+        soclib::caba::VciTarget<vci_param> 			p_vci;VciGcdCoprocessor::p_vci81,2123
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/vci_gcd_master.h,1217
+#define VCI_GCD_MASTER_H54,2022
+class VciGcdMaster65,2238
+	enum vci_gcd_master_fsm_state_e 69,2303
+		RANDOM,70,2338
+		CMD_OPA,71,2348
+		RSP_OPA,72,2359
+		CMD_OPB,73,2370
+		RSP_OPB,74,2381
+		CMD_START,75,2392
+		RSP_START,76,2405
+		CMD_STATUS,77,2418
+                RSP_STATUS,78,2432
+		CMD_RESULT,79,2460
+                RSP_RESULT,80,2474
+		DISPLAY,81,2502
+	sc_core::sc_signal<int> 			r_fsm;VciGcdMaster::r_fsm85,2532
+        sc_core::sc_signal<typename vci_param::data_t> 	r_opa;VciGcdMaster::r_opa86,2567
+        sc_core::sc_signal<typename vci_param::data_t> 	r_opb;VciGcdMaster::r_opb87,2630
+        sc_core::sc_signal<typename vci_param::data_t> 	r_res;VciGcdMaster::r_res88,2693
+        sc_core::sc_signal<int>   			r_cycle;VciGcdMaster::r_cycle89,2756
+        sc_core::sc_signal<int>   			r_iter;VciGcdMaster::r_iter90,2802
+	const typename vci_param::srcid_t		m_srcid;VciGcdMaster::m_srcid93,2862
+	const typename vci_param::addr_t		m_base;VciGcdMaster::m_base94,2907
+        sc_in<bool> 					p_resetn;VciGcdMaster::p_resetn101,3012
+        sc_in<bool> 					p_clk;VciGcdMaster::p_clk102,3047
+        soclib::caba::VciInitiator<vci_param>		p_vci;VciGcdMaster::p_vci103,3079
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/vci_gcd_coprocessor.cpp,358
+namespace soclib 38,1052
+namespace caba soclib::caba39,1071
+VciGcdCoprocessor<vci_param>::VciGcdCoprocessor(soclib::caba::VciGcdCoprocessor42,1119
+VciGcdCoprocessor<vci_param>::~VciGcdCoprocessor(~VciGcdCoprocessor69,1812
+void VciGcdCoprocessor<vci_param>::transition(transition75,1927
+void VciGcdCoprocessor<vci_param>::genMoore(genMoore157,4721
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/mapping_table.cpp,770
+namespace soclib 32,1028
+namespace soclib { namespace common soclib::common32,1028
+MappingTable::MappingTable(soclib::common::MappingTable::MappingTable34,1067
+MappingTable::MappingTable(49,1622
+const MappingTable &MappingTable::operator=(MappingTable::operator=59,1960
+void MappingTable::add(70,2304
+MappingTable::getAllSegmentList(111,3928
+MappingTable::getSegmentList(117,4019
+MappingTable::getSegment(132,4346
+MappingTable::getCacheabilityTable(140,4562
+MappingTable::getLocalityTable(171,5783
+MappingTable::getRoutingTable(206,7109
+MappingTable::addr_t *MappingTable::getCoherenceTable(MappingTable::getCoherenceTable272,9465
+void MappingTable::print(288,9943
+MappingTable::getIdMaskingTable(304,10399
+MappingTable::getIdLocalityTable(314,10706
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/address_decoding_table.cpp,355
+namespace soclib 31,956
+namespace soclib { namespace common soclib::common31,956
+#define tmpl(33,995
+tmpl(soclib::common::tmpl35,1100
+tmpl(43,1272
+tmpl(48,1324
+tmpl(53,1421
+tmpl(71,1746
+tmpl(77,1850
+tmpl(82,1933
+template <typename input_t,89,2118
+operator=(operator=91,2254
+tmpl(104,2494
+tmpl(109,2555
+tmpl(118,2868
+#undef tmpl126,3049
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/vci_target.h,2699
+#define SOCLIB_CABA_SIGNAL_VCI_TARGET_H_29,963
+class VciTarget44,1193
+	sc_in<typename vci_param::ack_t>     rspack;VciTarget::rspack47,1219
+	sc_out<typename vci_param::val_t>    rspval;VciTarget::rspval48,1265
+	sc_out<typename vci_param::data_t>   rdata;VciTarget::rdata49,1311
+	sc_out<bool>                         reop;VciTarget::reop50,1356
+	sc_out<typename vci_param::rerror_t> rerror;VciTarget::rerror51,1400
+	sc_out<typename vci_param::srcid_t>  rsrcid;VciTarget::rsrcid52,1446
+	sc_out<typename vci_param::trdid_t > rtrdid;VciTarget::rtrdid53,1492
+	sc_out<typename vci_param::pktid_t > rpktid;VciTarget::rpktid54,1538
+	sc_out<typename vci_param::ack_t>    cmdack;VciTarget::cmdack56,1585
+	sc_in<typename vci_param::val_t>     cmdval;VciTarget::cmdval57,1631
+	sc_in<typename vci_param::addr_t>    address;VciTarget::address58,1677
+	sc_in<typename vci_param::be_t>      be;VciTarget::be59,1724
+	sc_in<typename vci_param::cmd_t>     cmd;VciTarget::cmd60,1766
+	sc_in<typename vci_param::contig_t>  contig;VciTarget::contig61,1809
+	sc_in<typename vci_param::data_t>    wdata;VciTarget::wdata62,1855
+	sc_in<typename vci_param::eop_t>     eop;VciTarget::eop63,1900
+	sc_in<typename vci_param::const_t>   cons;VciTarget::cons64,1943
+	sc_in<typename vci_param::plen_t>    plen;VciTarget::plen65,1987
+	sc_in<typename vci_param::wrap_t>    wrap;VciTarget::wrap66,2031
+	sc_in<typename vci_param::cfixed_t>  cfixed;VciTarget::cfixed67,2075
+	sc_in<typename vci_param::clen_t>    clen;VciTarget::clen68,2121
+	sc_in<typename vci_param::srcid_t>   srcid;VciTarget::srcid69,2165
+	sc_in<typename vci_param::trdid_t>   trdid;VciTarget::trdid70,2210
+	sc_in<typename vci_param::pktid_t>   pktid;VciTarget::pktid71,2255
+#define __ren(73,2307
+    VciTarget(VciTarget::VciTarget74,2349
+#undef __ren101,2998
+	void operator()(VciTarget::operator()103,3012
+	void operator()(VciTarget::operator()131,3616
+    inline bool getAck(VciTarget::getAck159,4269
+    inline bool getVal(VciTarget::getVal164,4336
+    inline void setAck(VciTarget::setAck169,4403
+    inline void setVal(VciTarget::setVal174,4469
+    inline bool iProposed(VciTarget::iProposed179,4535
+    inline bool iAccepted(VciTarget::iAccepted184,4605
+    inline bool peerAccepted(VciTarget::peerAccepted189,4685
+    inline bool toPeerEnd(VciTarget::toPeerEnd194,4768
+    void rspSetIds(VciTarget::rspSetIds199,4854
+    void rspError(VciTarget::rspError208,5105
+    void rspRead(VciTarget::rspRead215,5232
+    inline void rspWrite(VciTarget::rspWrite222,5395
+    void rspNop(VciTarget::rspNop226,5469
+    friend sc_core::sc_sensitive &operator <<(VciTarget::operator <<231,5524
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/segment.h,1105
+#define SOCLIB_SEGMENT_H_31,1014
+class Segment40,1148
+    typedef unsigned long addr_t;42,1164
+    std::string m_name;Segment::m_name44,1203
+    addr_t m_base_address;Segment::m_base_address45,1227
+    size_t m_size;Segment::m_size46,1254
+    IntTab m_target_index;Segment::m_target_index47,1273
+    bool   m_cacheability;Segment::m_cacheability48,1300
+    bool   m_initiator;Segment::m_initiator49,1327
+    IntTab m_initiator_index;Segment::m_initiator_index50,1351
+    Segment(Segment::Segment53,1390
+    const Segment &operator=(Segment::operator=68,1930
+    inline addr_t baseAddress(Segment::baseAddress84,2355
+    inline size_t size(Segment::size89,2437
+    inline bool cacheable(Segment::cacheable94,2504
+    inline bool initiator(Segment::initiator99,2582
+    inline const std::string &name(Segment::name104,2657
+    inline const IntTab &index(Segment::index109,2736
+    inline const IntTab &initiator_index(Segment::initiator_index114,2819
+    friend std::ostream &operator << Segment::operator <<123,3012
+    inline bool contains(Segment::contains129,3136
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/mapping_table.h,936
+#define SOCLIB_MAPPING_TABLE_H31,1019
+class MappingTable44,1262
+    typedef uint32_t addr_t;47,1291
+    std::list<soclib::common::Segment> m_segment_list;MappingTable::m_segment_list50,1330
+    size_t m_addr_width;MappingTable::m_addr_width51,1385
+    IntTab m_level_addr_bits;MappingTable::m_level_addr_bits52,1410
+    IntTab m_level_id_bits;MappingTable::m_level_id_bits53,1440
+    addr_t m_cacheability_mask;MappingTable::m_cacheability_mask54,1468
+    addr_t m_rt_size;MappingTable::m_rt_size55,1500
+    AddressDecodingTable<MappingTable::AddressDecodingTable74,2072
+    AddressDecodingTable<MappingTable::AddressDecodingTable76,2142
+    AddressDecodingTable<MappingTable::AddressDecodingTable78,2229
+    AddressDecodingTable<MappingTable::AddressDecodingTable80,2337
+    friend std::ostream &operator << MappingTable::operator <<88,2593
+    inline unsigned int indexForId(MappingTable::indexForId94,2724
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/address_masking_table.h,508
+#define SOCLIB_ADDRESS_MASKING_TABLE_H29,961
+class AddressMaskingTable37,1107
+    size_t m_use_bits,39,1135
+    size_t m_use_bits, m_drop_bits;39,1135
+    data_t m_low_mask;40,1171
+    void init(42,1195
+    inline data_t mask(44,1242
+    AddressMaskingTable(50,1334
+    AddressMaskingTable(51,1361
+    AddressMaskingTable(52,1416
+    AddressMaskingTable(53,1456
+    inline size_t getDrop(56,1600
+	void print(61,1675
+    friend std::ostream &operator << AddressMaskingTable::operator <<68,1826
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/vci_vgsb.cpp,512
+namespace soclib 36,1065
+namespace soclib { namespace caba soclib::caba36,1065
+VciVgsb<vci_param>::VciVgsb soclib::caba::VciVgsb40,1160
+VciVgsb<vci_param>::~VciVgsb(~VciVgsb90,2951
+void VciVgsb<vci_param>::transition(transition99,3269
+void VciVgsb<vci_param>::genMealy_cmdval(genMealy_cmdval164,5606
+void VciVgsb<vci_param>::genMealy_cmdack(genMealy_cmdack196,7037
+void VciVgsb<vci_param>::genMealy_rspval(genMealy_rspval218,7728
+void VciVgsb<vci_param>::genMealy_rspack(genMealy_rspack246,8882
+
+/home/jchen/Work/systemc/TP/TP2_etudiant/int_tab.h,666
+#define SOCLIB_INT_TAB_H_29,948
+class IntTab36,1056
+    typedef int value_t;39,1079
+    value_t m_values[m_values43,1156
+    size_t m_level;44,1191
+    IntTab(47,1220
+    IntTab(72,1839
+    IntTab(77,1916
+    IntTab(85,2100
+    IntTab(100,2403
+    void init(112,2595
+    value_t operator*(IntTab::operator*132,3106
+    value_t sum(IntTab::sum145,3448
+    inline size_t level(IntTab::level155,3678
+    bool operator==(IntTab::operator==160,3747
+    bool operator!=(IntTab::operator!=167,3908
+    bool idMatches(IntTab::idMatches172,4004
+    void print(IntTab::print182,4274
+    friend std::ostream &operator << IntTab::operator <<193,4507
