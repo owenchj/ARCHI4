@@ -405,8 +405,8 @@ tmpl(void)::transition()
             }
             else                         // non cacheable
             {
-                m_cpt_ins_unc++;
-                m_cost_ins_unc_frz++;
+                m_cpt_ins_miss++;
+                m_cost_ins_miss_frz++;
 
                 r_icache_addr_save = m_ireq.addr;
                 r_icache_fsm 	   = ICACHE_UNC_WAIT;
@@ -549,7 +549,10 @@ tmpl(void)::transition()
     //////////////////////
     case DCACHE_WRITE_REQ:  // only cacheable write are written in wbuf
     {
-        if( not r_wbuf.wok( r_dcache_addr_save ) )
+        if( not r_wbuf.write( r_dcache_addr_save.read(),
+                              r_dcache_be_save.read(),
+                              r_dcache_wdata_save.read(),
+                              true) )
         {
             //  stay in DCACHE_WRITEREQ state if the request is not accepted 
             m_cost_write_frz++;
@@ -579,7 +582,7 @@ tmpl(void)::transition()
             // dcache_hit, dcache_way, dcache_set, dcache_word & dcache_rdata evaluation
             dcache_hit 		= r_dcache.read( m_dreq.addr,
                                                  &dcache_rdata,
-                                                 &dcache_ways,
+                                                 &dcache_way,
                                                  &dcache_set,
                                                  &dcache_word);
 
@@ -602,7 +605,7 @@ tmpl(void)::transition()
                     m_cost_data_unc_frz++;
 
                     r_dcache_unc_req   	= true;
-                    r_dcache_fsm 		= TO BE COMPLETED 
+                    r_dcache_fsm 		= DCACHE_UNC_WAIT; 
 	            }
                 else
                 {
@@ -612,7 +615,7 @@ tmpl(void)::transition()
                     {
                         m_drsp.valid 	= true;
                         m_drsp.rdata 	= dcache_rdata;
-                        r_dcache_fsm 	= TO BE COMPLETED
+                        r_dcache_fsm 	= DCACHE_IDLE;
                     }
                     else 		         	           // cacheable read miss
                     {
@@ -621,7 +624,7 @@ tmpl(void)::transition()
 
                         r_dcache_word_save  = 0;
                         r_dcache_miss_req  	= true;
-                        r_dcache_fsm 		= TO BE COMPLETED    
+                        r_dcache_fsm 		= DCACHE_MISS_SELECT;
                     }
                 }
             }
@@ -633,7 +636,7 @@ tmpl(void)::transition()
                     m_cost_data_unc_frz++;
 
                     r_dcache_unc_req   	= true;
-                    r_dcache_fsm 		= TO BE COMPLETED 
+                    r_dcache_fsm 		= DCACHE_UNC_WAIT;
                 }
                 else
                 {
@@ -643,7 +646,7 @@ tmpl(void)::transition()
                     {
                         m_drsp.rdata 	= 0;
                         m_drsp.valid 	= true;
-                        r_dcache_fsm 	= TO BE COMPLETED  
+                        r_dcache_fsm 	= DCACHE_WRITE_REQ;
                     }
                     else 						       // cacheable write hit 
                     {
@@ -651,7 +654,7 @@ tmpl(void)::transition()
 
                         m_drsp.rdata 	= 0;
                         m_drsp.valid 	= true;
-                        r_dcache_fsm 	= TO BE COMPLETED   
+                        r_dcache_fsm 	= DCACHE_WRITE_UPDT;
                     }
                 }
             }
@@ -663,7 +666,7 @@ tmpl(void)::transition()
                 m_cost_data_unc_frz++;
 
                 r_dcache_unc_req   		= true;
-                r_dcache_fsm 			= TO BE COMPLETED 
+                r_dcache_fsm 			= DCACHE_UNC_WAIT; 
             }
             else if( (m_dreq.type == iss_t::XTN_WRITE) or 
                      (m_dreq.type == iss_t::XTN_READ) ) 
@@ -702,7 +705,7 @@ tmpl(void)::transition()
                         r_dcache_word_save.read(),
                         r_dcache_wdata_save.read(),
                         r_dcache_be_save.read() );
-        r_dcache_fsm = TO BE COMPLETED  
+        r_dcache_fsm = DCACHE_WRITE_REQ;  
         break;
     }
     ////////////////////////
@@ -721,8 +724,8 @@ tmpl(void)::transition()
                                         &set );
         r_dcache_way_save = way;
         r_dcache_set_save = set;
-        if ( valid ) r_dcache_fsm = TO BE COMPLETED  
-        else         r_dcache_fsm = TO BE COMPLETED 
+        if ( valid ) r_dcache_fsm = DCACHE_MISS_INVAL;
+        else         r_dcache_fsm = DCACHE_MISS_WAIT;
         break;
     }
     ///////////////////////
@@ -736,7 +739,7 @@ tmpl(void)::transition()
                         r_dcache_set_save.read(),
                         &nline );
 
-        r_dcache_fsm = TO BE COMPLETED  
+        r_dcache_fsm = DCACHE_MISS_WAIT;
         break;
     }
     //////////////////////
@@ -749,7 +752,7 @@ tmpl(void)::transition()
             m_drsp.valid         = true;
             m_drsp.error         = true;
             r_vci_rsp_data_error = false;
-        	r_dcache_fsm         = TO BE COMPLETED  
+        	r_dcache_fsm         = DCACHE_IDLE;
         }
         else if ( r_vci_rsp_fifo_data.rok() )  // available data
         {
@@ -767,7 +770,7 @@ tmpl(void)::transition()
                 r_dcache.victim_update_tag( r_dcache_addr_save.read(),
                                             r_dcache_way_save.read(),
                                             r_dcache_set_save.read() );
-           	    r_dcache_fsm = TO BE COMPLETED  
+           	    r_dcache_fsm = DCACHE_IDLE;
             }
         }
         break;
@@ -782,7 +785,7 @@ tmpl(void)::transition()
             m_drsp.valid         = true;
             m_drsp.error         = true;
             r_vci_rsp_data_error = false;
-        	r_dcache_fsm         = TO BE COMPLETED  
+        	r_dcache_fsm         = DCACHE_IDLE;
         }
         else if ( r_vci_rsp_fifo_data.rok() )   // available data
         {
@@ -793,7 +796,7 @@ tmpl(void)::transition()
                 m_drsp.valid = true;
                 m_drsp.rdata = r_vci_rsp_fifo_data.read();
             }
-            r_dcache_fsm = TO BE COMPLETED  
+            r_dcache_fsm = DCACHE_IDLE;
         }
         break;
     }
@@ -836,7 +839,7 @@ tmpl(void)::transition()
     /////////////////////
     case DCACHE_XTN_SYNC:     // waiting write buffer empty
     {
-        if ( TO BE COMPLETED ) 
+        if (r_wbuf.empty()) 
         {
             r_dcache_fsm = DCACHE_IDLE;
             m_drsp.valid = true;
@@ -894,17 +897,17 @@ tmpl(void)::transition()
     {
         size_t min;
         size_t max;
-        if ( TO BE COMPLETED )	
+        if ( r_dcache_miss_req.read() && (r_wbuf.miss(r_dcache_addr_save.read())) )	
         {
             r_vci_cmd_fsm = CMD_DATA_MISS;
             r_dcache_miss_req = false;
         } 
-        else if ( TO BE COMPLETED )	
+        else if ( r_icache_miss_req.read() && (r_wbuf.miss(r_icache_addr_save.read())) )	
         {
             r_vci_cmd_fsm = CMD_INS_MISS;
             r_icache_miss_req = false;
         } 
-        else if ( TO BE COMPLETED ) 
+        else if (r_wbuf.rok(&min, &max) ) 
         {
             r_vci_cmd_fsm   = CMD_DATA_WRITE;
             r_vci_cmd_min   = min;
@@ -913,12 +916,12 @@ tmpl(void)::transition()
             m_count_write_transaction++;
             m_length_write_transaction += (max-min+1);
         }
-        else if ( TO BE COMPLETED ) 
+        else if ( r_dcache_unc_req ) 
         {
             r_vci_cmd_fsm = CMD_DATA_UNC;
             r_dcache_unc_req = false;
         }
-        else if ( TO BE COMPLETED ) 
+        else if ( r_icache_unc_req ) 
         {
             r_vci_cmd_fsm = CMD_INS_UNC;
             r_icache_unc_req = false;
@@ -934,7 +937,7 @@ tmpl(void)::transition()
             if (r_vci_cmd_cpt == r_vci_cmd_max) 
             {
                 r_vci_cmd_fsm = CMD_IDLE ;
-                TO BE COMPLETED
+                r_wbuf.sent();
             }
         }
         break;
@@ -972,11 +975,11 @@ tmpl(void)::transition()
         if( p_vci.rspval.read() ) 
         {
             r_vci_rsp_cpt = 0;
-            if      ( TO BE COMPLETED ) r_vci_rsp_fsm = RSP_DATA_WRITE;
-            else if ( TO BE COMPLETED )	r_vci_rsp_fsm = RSP_DATA_MISS;
-            else if ( TO BE COMPLETED )	r_vci_rsp_fsm = RSP_DATA_UNC;
-            else if ( TO BE COMPLETED )	r_vci_rsp_fsm = RSP_INS_MISS;
-            else if ( TO BE COMPLETED )	r_vci_rsp_fsm = RSP_INS_UNC;
+            if      ( (p_vci.rtrdid.read() >> (vci_param::T - 1)) != 0 )  r_vci_rsp_fsm = RSP_DATA_WRITE;
+            else if ( p_vci.rtrdid.read() == TYPE_DATA_MISS )	r_vci_rsp_fsm = RSP_DATA_MISS;
+            else if ( p_vci.rtrdid.read() == TYPE_DATA_UNC )	r_vci_rsp_fsm = RSP_DATA_UNC;
+            else if ( p_vci.rtrdid.read() == TYPE_INS_MISS)	r_vci_rsp_fsm = RSP_INS_MISS;
+            else if ( p_vci.rtrdid.read() == TYPE_INS_UNC )	r_vci_rsp_fsm = RSP_INS_UNC;
         } 
         break;
     }
@@ -989,7 +992,7 @@ tmpl(void)::transition()
                "A VCI response packet must contain one flit for a write transaction" ); 
 
             r_vci_rsp_fsm = RSP_IDLE;
-            TO BE COMPLETED                                                 
+            r_wbuf.completed(p_vci.rtrdid.read() - (1 << (vci_param::T - 1)) );
             if ( (p_vci.rerror.read() & 0x1) == 0x1 )  m_iss.setWriteBerr();
         }
         break;
@@ -1010,8 +1013,8 @@ tmpl(void)::transition()
                 "The VCI response packet for instruction miss is too long" );
 
                 r_vci_rsp_cpt         = r_vci_rsp_cpt + 1;
-                vci_rsp_fifo_ins_put  = TO BE COMPLETED
-                vci_rsp_fifo_ins_data = TO BE COMPLETED
+                vci_rsp_fifo_ins_put  = true;
+                vci_rsp_fifo_ins_data = p_vci.rdata.read();
                 if ( p_vci.reop.read() ) 
                 {
                     assert( (r_vci_rsp_cpt == m_icache_words - 1) &&
@@ -1037,8 +1040,8 @@ tmpl(void)::transition()
             }
             else if( r_vci_rsp_fifo_ins.wok() )   // fifo not full
             {
-                vci_rsp_fifo_ins_put  = TO BE COMPLETED
-                vci_rsp_fifo_ins_data = TO BE COMPLETED    
+                vci_rsp_fifo_ins_put  = true;
+                vci_rsp_fifo_ins_data = p_vci.rdata.read();
                 r_vci_rsp_fsm         = RSP_IDLE;
             }
         }
@@ -1060,8 +1063,8 @@ tmpl(void)::transition()
                 "The VCI response packet for data miss is too long" );
 
                 r_vci_rsp_cpt          = r_vci_rsp_cpt + 1;
-                vci_rsp_fifo_ins_put  = TO BE COMPLETED
-                vci_rsp_fifo_ins_data = TO BE COMPLETED    
+                vci_rsp_fifo_data_put  = true;
+                vci_rsp_fifo_data_data = p_vci.rdata.read();
                 if ( p_vci.reop.read() ) 
                 {
                     assert( (r_vci_rsp_cpt == m_dcache_words - 1) &&
@@ -1087,8 +1090,8 @@ tmpl(void)::transition()
             }
             else if( r_vci_rsp_fifo_data.wok() )   // fifo not full
             {
-                vci_rsp_fifo_data_put  = TO BE COMPLETED
-                vci_rsp_fifo_data_data = TO BE COMPLETED    
+                vci_rsp_fifo_data_put  = true;
+                vci_rsp_fifo_data_data = p_vci.rdata.read();
                 r_vci_rsp_fsm          = RSP_IDLE;
             }
         }
@@ -1144,7 +1147,7 @@ tmpl(void)::genMoore()
         p_vci.plen    = (r_vci_cmd_max - r_vci_cmd_min + 1)<<2;
         p_vci.cmd     = vci_param::CMD_WRITE;
         p_vci.pktid   = 0;
-        p_vci.trdid   = TO BE COMPLETED                             
+        p_vci.trdid   = r_wbuf.getIndex() + (1<<(vci_param::T-1));
         p_vci.srcid   = m_srcid;
         p_vci.cons    = false;
         p_vci.wrap    = false;
@@ -1161,7 +1164,7 @@ tmpl(void)::genMoore()
         p_vci.plen   = m_dcache_words << 2;
         p_vci.cmd    = vci_param::CMD_READ;
         p_vci.pktid  = 0;
-        p_vci.trdid  = TO BE COMPLETED                             
+        p_vci.trdid  = TYPE_DATA_MISS;
         p_vci.srcid  = m_srcid;
         p_vci.cons   = false;
         p_vci.wrap   = false;
@@ -1200,7 +1203,7 @@ tmpl(void)::genMoore()
         }
         p_vci.plen = 4;
         p_vci.pktid  = 0;
-        p_vci.trdid  = TO BE COMPLETED                             
+        p_vci.trdid  = TYPE_DATA_UNC;
         p_vci.srcid  = m_srcid;
         p_vci.cons   = false;
         p_vci.wrap   = false;
@@ -1217,7 +1220,7 @@ tmpl(void)::genMoore()
         p_vci.plen   = m_icache_words << 2;
         p_vci.cmd    = vci_param::CMD_READ;
         p_vci.pktid  = 0;
-        p_vci.trdid  = TO BE COMPLETED                             
+        p_vci.trdid  = TYPE_INS_MISS;
         p_vci.srcid  = m_srcid;
         p_vci.cons   = false;
         p_vci.wrap   = false;
@@ -1234,7 +1237,7 @@ tmpl(void)::genMoore()
         p_vci.plen   = 4;
         p_vci.cmd    = vci_param::CMD_READ;
         p_vci.pktid  = 0;
-        p_vci.trdid  = TO BE COMPLETED                             
+        p_vci.trdid  = TYPE_INS_UNC;
         p_vci.srcid  = m_srcid;
         p_vci.cons   = false;
         p_vci.wrap   = false;
