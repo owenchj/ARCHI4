@@ -47,6 +47,16 @@ int sc_main(int argc, char *argv[])
 	coproc.p_in(signal_fifo_m2c);
 	coproc.p_out(signal_fifo_c2m);
 
+        	/////////////////////////////////////////////////////////////////
+	// Trace
+	/////////////////////////////////////////////////////////////////
+
+        sc_trace_file* tfp = sc_create_vcd_trace_file("gcd");
+	sc_trace(tfp, signal_clk, signal_clk.name());
+        sc_trace(tfp, signal_resetn, signal_resetn.name());
+        signal_fifo_c2m.trace(tfp, "signal_fifo_c2m");
+        signal_fifo_m2c.trace(tfp, "signal_fifo_m2c");
+
 	/////////////////////////////////////////////////////////////////
 	// simulation
 	/////////////////////////////////////////////////////////////////
@@ -58,6 +68,8 @@ int sc_main(int argc, char *argv[])
 	signal_resetn = true;
 	for (int n=1 ; n<ncycles ; n++ )  sc_start( sc_time( 1, SC_NS ) ) ;
 
+        sc_close_vcd_trace_file(tfp);
+        
 	return(0);
 
 } // end sc_main
